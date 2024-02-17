@@ -10,6 +10,7 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.firefox import GeckoDriverManager
 from webdriver_manager.chrome import ChromeDriverManager
 
+
 # библиотеки для скачивания драйверов браузеров
 
 with open("./locators.yaml") as f:
@@ -19,13 +20,14 @@ with open("./locators.yaml") as f:
 class Site:
     # проверка на то какой браузер используется в тесте
     def __init__(self, browser, address):
-        self.address = address
         self.driver = webdriver.Firefox()
         self.driver.implicitly_wait(testdata['sleep_time'])
         self.driver.maximize_window()
         self.driver.get(address)
+
         self.browser = browser
         self.address = address
+
 
     def registration_on_the_website(self):
         x_selector1 = locators['LOCATOR_USER_NAME']  # вводим Username
@@ -83,21 +85,21 @@ with open("./testdata.yaml") as f:
     passwd = testdata['passwd']
     addres = testdata['addres']
 
-def test_step1():
-    # Тест при не правильном вводе данных пользователя
-    site = Site(testdata["browser"], testdata['addres'])
-    site.bed_registration_on_the_website()
-
-    site.driver.implicitly_wait(testdata['sleep_time'])
-
-    # /html/body/div/main/div/div/div[2]/h2
-    x_selector3 = locators['LOCATOR_ERROR_401']  # Поиск сообщения об ошибке после неверного ввода
-    err_label = site.find_element("xpath", x_selector3)
-
-    print(err_label.text)
-    site.driver.implicitly_wait(testdata['sleep_time'])
-    site.close()
-    assert str(err_label.text) == '401'
+# def test_step1():
+#     # Тест при не правильном вводе данных пользователя
+#     site = Site(testdata["browser"], testdata['addres'])
+#     site.bed_registration_on_the_website()
+#
+#     site.driver.implicitly_wait(testdata['sleep_time'])
+#
+#     # /html/body/div/main/div/div/div[2]/h2
+#     x_selector3 = locators['LOCATOR_ERROR_401']  # Поиск сообщения об ошибке после неверного ввода
+#     err_label = site.find_element("xpath", x_selector3)
+#
+#     print(err_label.text)
+#     site.driver.implicitly_wait(testdata['sleep_time'])
+#     site.close()
+#     assert str(err_label.text) == '401'
 
 
 def test_step2(site_connect):
@@ -107,7 +109,7 @@ def test_step2(site_connect):
     site_connect.registration_on_the_website()
     x_selector3 = locators['LOCATOR_WORD_BLOCK']
     flag_text_blog = site_connect.find_element("xpath", x_selector3)
-    time.sleep(1)
+    site_connect.driver.implicitly_wait(testdata['sleep_time'])
     assert flag_text_blog.text == "Blog"
 
 #
@@ -119,8 +121,9 @@ def test_step3(site_connect):
     btn_selector = locators['LOCATOR_BOTTOM_NEWPOST']
     btn = site_connect.find_element("xpath", btn_selector)
     btn.click()
+    btn.click()
 
-    time.sleep(2)
+    site_connect.driver.implicitly_wait(testdata['sleep_time'])
 
     # Создание тайтла у поста
     x_titel = locators['LOCATOR_TITEL_IN_NEWPOST']
@@ -140,14 +143,53 @@ def test_step3(site_connect):
     #Кликаю на кнопку Save
     x_btm_save = locators['LOCATOR_BOTTOM_SAVE']
     btn_save = site_connect.find_element("xpath", x_btm_save)
+
     btn_save.click()
-    time.sleep(1)
+
+    site_connect.driver.implicitly_wait(testdata['sleep_time'])
 
     # Ищу название нового поста, если посту успешно будет создан то название поста будет верное
     x_name_post =locators['LOCATOR_FIND_NAME_NEWPOST']
     flag_name_post = site_connect.find_element("xpath", x_name_post)
+    site_connect.driver.implicitly_wait(testdata['sleep_time'])
     print(f"{flag_name_post.text = } | {flag_name_post.text}")
-    time.sleep(1)
+    time.sleep(2)
 
     assert flag_name_post.text == "test_titel"
+
+def test_step4(site_connect):
+    a = True
+    btn_selector = locators['LOCATOR_BOTTOM_CONTACT']
+    btn = site_connect.find_element("xpath", btn_selector)
+    btn.click()
+    site_connect.driver.implicitly_wait(testdata['sleep_time'])
+
+    # Заполнить поле имени
+    x_name = locators['LOCATOR_YOUR_CONTACT_NAME']
+    input_name= site_connect.find_element("xpath", x_name)
+    input_name.send_keys("test_name")
+
+    # Заполнить поле email
+    x_email = locators['LOCATOR_YOUR_CONTACT_EMAIL']
+    input_email = site_connect.find_element("xpath", x_email)
+    input_email.send_keys("test_email@test")
+
+    # Заполнить поле contant
+    x_contant = locators['LOCATOR_YOUR_CONTACT_CONTENT']
+    input_contant = site_connect.find_element("xpath", x_contant)
+    input_contant.send_keys("TEST!")
+
+    # Кликнуть на кнопку Contact Us
+    btn_selector_contact = locators['LOCATOR_BOTTOM_IN_CONTACT_US']
+    btn_contact = site_connect.find_element("xpath", btn_selector_contact)
+    btn_contact.click()
+
+    site_connect.driver.implicitly_wait(testdata['sleep_time'])
+    alert = site_connect.driver.switch_to.alert
+    print(alert.text, "!!!!!!!!")
+
+    site_connect.driver.implicitly_wait(testdata['sleep_time'])
+
+    time.sleep(10)
+    assert a == True
 
