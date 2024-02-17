@@ -12,6 +12,9 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 # библиотеки для скачивания драйверов браузеров
 
+with open("./locators.yaml") as f:
+    locators = yaml.safe_load(f)
+
 
 class Site:
     # проверка на то какой браузер используется в тесте
@@ -22,17 +25,29 @@ class Site:
         self.driver.maximize_window()
         self.driver.get(address)
         self.browser = browser
-        time.sleep(testdata["sleep_time"])
         self.address = address
 
     def registration_on_the_website(self):
-        x_selector1 = """//*[@id="login"]/div[1]/label/input"""  # вводим Username
+        x_selector1 = locators['LOCATOR_USER_NAME']  # вводим Username
         input1 = self.find_element("xpath", x_selector1)
         input1.send_keys(username)
 
-        x_selector2 = """//*[@id="login"]/div[2]/label/input"""  # вводим passwd
+        x_selector2 = locators['LOCATOR_PASSWORD']  # вводим passwd
         input2 = self.find_element("xpath", x_selector2)
         input2.send_keys(passwd)
+
+        btn_selector = "button"
+        btn = self.find_element("css", btn_selector)
+        btn.click()
+
+    def bed_registration_on_the_website(self):
+        x_selector1 = locators['LOCATOR_USER_NAME']  # вводим Username
+        input1 = self.find_element("xpath", x_selector1)
+        input1.send_keys("test")
+
+        x_selector2 = locators['LOCATOR_PASSWORD']  # вводим passwd
+        input2 = self.find_element("xpath", x_selector2)
+        input2.send_keys("test")
 
         btn_selector = "button"
         btn = self.find_element("css", btn_selector)
@@ -67,35 +82,30 @@ with open("./testdata.yaml") as f:
     username = testdata['user_name']
     passwd = testdata['passwd']
     addres = testdata['addres']
-    # site = Site(testdata["browser"],testdata['addres'])
 
+def test_step1():
+    # Тест при не правильном вводе данных пользователя
+    site = Site(testdata["browser"], testdata['addres'])
+    site.bed_registration_on_the_website()
 
-# def test_step1():
-#     # Тест при не правильном вводе данных пользователя
-#     x_selector1 = """//*[@id="login"]/div[1]/label/input"""  # вводим Username
-#     input1 = site.find_element("xpath", x_selector1)
-#     input1.send_keys("test")
-#
-#     x_selector2 = """//*[@id="login"]/div[2]/label/input"""  # вводим passwd
-#     input2 = site.find_element("xpath", x_selector2)
-#     input2.send_keys("test")
-#
-#     btn_selector = "button"
-#     btn = site.find_element("css", btn_selector)
-#     btn.click()
-#
-#     x_selector3 = """//*[@id="app"]/main/div/div/div[2]/h2"""  # Поиск сообщения об ошибке после неверного ввода
-#     err_label = site.find_element("xpath", x_selector3)
-#     assert err_label.text == "401"
+    site.driver.implicitly_wait(testdata['sleep_time'])
+
+    # /html/body/div/main/div/div/div[2]/h2
+    x_selector3 = locators['LOCATOR_ERROR_401']  # Поиск сообщения об ошибке после неверного ввода
+    err_label = site.find_element("xpath", x_selector3)
+
+    print(err_label.text)
+    site.driver.implicitly_wait(testdata['sleep_time'])
+    site.close()
+    assert str(err_label.text) == '401'
 
 
 def test_step2(site_connect):
     # Тест при правильном вводе данных пользователя
 
-
     # Ищу слово Blog, которое высвечивается после успешной регистрации
     site_connect.registration_on_the_website()
-    x_selector3 = """//*[@id="app"]/main/div/div[1]/h1"""
+    x_selector3 = locators['LOCATOR_WORD_BLOCK']
     flag_text_blog = site_connect.find_element("xpath", x_selector3)
     time.sleep(1)
     assert flag_text_blog.text == "Blog"
@@ -106,56 +116,38 @@ def test_step3(site_connect):
 
     # Нажимаю на кнопку Нового поста
 
-    btn_selector = """//*[@id="create-btn"]"""
+    btn_selector = locators['LOCATOR_BOTTOM_NEWPOST']
     btn = site_connect.find_element("xpath", btn_selector)
     btn.click()
 
     time.sleep(2)
 
     # Создание тайтла у поста
-    x_titel = """/html/body/div/main/div/div/form/div/div/div[1]/div/label/input"""
+    x_titel = locators['LOCATOR_TITEL_IN_NEWPOST']
     input_titel = site_connect.find_element("xpath", x_titel)
     input_titel.send_keys("test_titel")
 
     # Создание дискрипшена
-    x_discription = """//*[@id="create-item"]/div/div/div[2]/div/label/span/textarea"""
+    x_discription = locators['LOCATOR_DISCCRIPTION_IN_NEWPOST']
     input_discription = site_connect.find_element("xpath", x_discription)
     input_discription.send_keys("test_discription")
 
     # Создание контента
-    x_content = """//*[@id="create-item"]/div/div/div[3]/div/label/span/textarea"""
+    x_content = locators['LOCATOR_CONTENT_IN_NEWPOST']
     input_content = site_connect.find_element("xpath", x_content)
     input_content.send_keys("test_content")
 
-    # # Создание колендаря
-    # ddd1 = date.today()  # создание даты для ввода
-    # ddd1 = ddd1 - timedelta(days=1)
-    # i = int(ddd1.day) + 1  # вводим дату на "завтра"
-    #
-    # x_calendar = """//*[@id="create-item"]/div/div/div[5]/div/div/label"""
-    # input_calendar = site.find_element("xpath", x_calendar)
-    # input_calendar[i].click()
-
     #Кликаю на кнопку Save
-    x_btm_save = """/html/body/div/main/div/div/form/div/div/div[7]/div/button/span"""
+    x_btm_save = locators['LOCATOR_BOTTOM_SAVE']
     btn_save = site_connect.find_element("xpath", x_btm_save)
     btn_save.click()
     time.sleep(1)
 
-
     # Ищу название нового поста, если посту успешно будет создан то название поста будет верное
-
-    x_name_post = """/html/body/div[1]/main/div/div[1]/h1"""
+    x_name_post =locators['LOCATOR_FIND_NAME_NEWPOST']
     flag_name_post = site_connect.find_element("xpath", x_name_post)
     print(f"{flag_name_post.text = } | {flag_name_post.text}")
     time.sleep(1)
 
     assert flag_name_post.text == "test_titel"
 
-# def test_test1(site_connect):
-#     a = True
-#
-#     with open("./test.txt", 'w') as f:
-#         f.write(str(site_connect.__dir__()))
-#     time.sleep(2)
-#     assert a == True
