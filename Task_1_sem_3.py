@@ -93,19 +93,19 @@ with open("./testdata.yaml") as f:
 
 def test_step1():
     # Тест при не правильном вводе данных пользователя
-    site = Site(testdata["browser"], testdata['addres'])
-    site.bed_registration_on_the_website()
+    site_bed = Site(testdata["browser"], testdata['addres'])
+    site_bed.bed_registration_on_the_website()
 
-    site.driver.implicitly_wait(testdata['sleep_time'])
+    site_bed.driver.implicitly_wait(testdata['sleep_time'])
 
     # /html/body/div/main/div/div/div[2]/h2
     x_selector3 = locators['LOCATOR_ERROR_401']  # Поиск сообщения об ошибке после неверного ввода
-    err_label = site.find_element("xpath", x_selector3)
+    err_label = site_bed.find_element("xpath", x_selector3)
 
     print(err_label.text)
-    site.driver.implicitly_wait(testdata['sleep_time'])
-    site.close()
+    site_bed.driver.implicitly_wait(testdata['sleep_time'])
     assert str(err_label.text) == '401'
+    site_bed.close()
 
 
 def test_step2(site_connect):
