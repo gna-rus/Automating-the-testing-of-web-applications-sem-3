@@ -20,13 +20,19 @@ with open("./locators.yaml") as f:
 class Site:
     # проверка на то какой браузер используется в тесте
     def __init__(self, browser, address):
+        self.browser = browser
+        self.address = address
+
+        if self.browser == 'chrome':
+            self.driver = webdriver.Chrome()
+        elif self.browser == 'firefox':
+            self.driver = webdriver.Chrome()
+
         self.driver = webdriver.Firefox()
         self.driver.implicitly_wait(testdata['sleep_time'])
         self.driver.maximize_window()
         self.driver.get(address)
 
-        self.browser = browser
-        self.address = address
 
 
     def registration_on_the_website(self):
@@ -85,21 +91,21 @@ with open("./testdata.yaml") as f:
     passwd = testdata['passwd']
     addres = testdata['addres']
 
-# def test_step1():
-#     # Тест при не правильном вводе данных пользователя
-#     site = Site(testdata["browser"], testdata['addres'])
-#     site.bed_registration_on_the_website()
-#
-#     site.driver.implicitly_wait(testdata['sleep_time'])
-#
-#     # /html/body/div/main/div/div/div[2]/h2
-#     x_selector3 = locators['LOCATOR_ERROR_401']  # Поиск сообщения об ошибке после неверного ввода
-#     err_label = site.find_element("xpath", x_selector3)
-#
-#     print(err_label.text)
-#     site.driver.implicitly_wait(testdata['sleep_time'])
-#     site.close()
-#     assert str(err_label.text) == '401'
+def test_step1():
+    # Тест при не правильном вводе данных пользователя
+    site = Site(testdata["browser"], testdata['addres'])
+    site.bed_registration_on_the_website()
+
+    site.driver.implicitly_wait(testdata['sleep_time'])
+
+    # /html/body/div/main/div/div/div[2]/h2
+    x_selector3 = locators['LOCATOR_ERROR_401']  # Поиск сообщения об ошибке после неверного ввода
+    err_label = site.find_element("xpath", x_selector3)
+
+    print(err_label.text)
+    site.driver.implicitly_wait(testdata['sleep_time'])
+    site.close()
+    assert str(err_label.text) == '401'
 
 
 def test_step2(site_connect):
@@ -112,7 +118,7 @@ def test_step2(site_connect):
     site_connect.driver.implicitly_wait(testdata['sleep_time'])
     assert flag_text_blog.text == "Blog"
 
-#
+
 def test_step3(site_connect):
     # Тест создание нового поста
 
@@ -140,17 +146,16 @@ def test_step3(site_connect):
     input_content = site_connect.find_element("xpath", x_content)
     input_content.send_keys("test_content")
 
-    #Кликаю на кнопку Save
+    # Кликаю на кнопку Save
     x_btm_save = locators['LOCATOR_BOTTOM_SAVE']
     btn_save = site_connect.find_element("xpath", x_btm_save)
-
     btn_save.click()
 
     site_connect.driver.implicitly_wait(testdata['sleep_time'])
 
     # Ищу название нового поста, если посту успешно будет создан то название поста будет верное
-    x_name_post =locators['LOCATOR_FIND_NAME_NEWPOST']
-    flag_name_post = site_connect.find_element("xpath", x_name_post)
+    x_name_post =locators['LOCATOR_FIND_NAME_NEWPOST_CSS']
+    flag_name_post = site_connect.find_element("css", x_name_post)
     site_connect.driver.implicitly_wait(testdata['sleep_time'])
     print(f"{flag_name_post.text = } | {flag_name_post.text}")
     time.sleep(2)
@@ -185,11 +190,13 @@ def test_step4(site_connect):
     btn_contact.click()
 
     site_connect.driver.implicitly_wait(testdata['sleep_time'])
-    alert = site_connect.driver.switch_to.alert
-    print(alert.text, "!!!!!!!!")
+    time.sleep(1)
 
+    alert = site_connect.driver.switch_to.alert  # отлавливаю контекстное окно alert
+    alert_text = alert.text
     site_connect.driver.implicitly_wait(testdata['sleep_time'])
+    alert.dismiss() # клик на кнопку ОК в alert
 
-    time.sleep(10)
-    assert a == True
+    time.sleep(2)
+    assert alert_text == 'Form successfully submitted'
 
