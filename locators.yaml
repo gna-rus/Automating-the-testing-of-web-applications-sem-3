@@ -8,6 +8,7 @@ LOCATOR_DISCCRIPTION_IN_NEWPOST: //*[@id="create-item"]/div/div/div[2]/div/label
 LOCATOR_CONTENT_IN_NEWPOST: //*[@id="create-item"]/div/div/div[3]/div/label/span/textarea
 LOCATOR_BOTTOM_SAVE: /html/body/div/main/div/div/form/div/div/div[7]/div/button/span
 LOCATOR_FIND_NAME_NEWPOST: /html/body/div[1]/main/div/div[1]/h1
+LOCATOR_FIND_NAME_NEWPOST_CSS: h1.svelte-tv8alb
 LOCATOR_BOTTOM_CONTACT: /html/body/div[1]/main/nav/ul/li[2]/a
 LOCATOR_YOUR_CONTACT_NAME: /html/body/div[1]/main/div/div/form/div[1]/label/input
 LOCATOR_YOUR_CONTACT_EMAIL: /html/body/div[1]/main/div/div/form/div[2]/label/input
